@@ -4,28 +4,43 @@
 
 var dependencyControllers = angular.module('dependencyControllers',[]);
 
-dependencyControllers.controller('controller1',['$scope','$location','$firebase',function($scope,$location,$firebase){
-	
-	var currentRef = new Firebase('https://djwadichat.firebaseio.com');
-	var loginStatus = false;
-	$scope.auth = new FirebaseSimpleLogin(currentRef,function(error,user,$location){
-		alert('called firebase simple login');
+
+// Controller for handling logins
+dependencyControllers.controller('loginController',
+	['$rootScope','$scope','$location','$firebaseSimpleLogin','$routeParams',function($routeParams,$scope,$location,$rootScope,$firebaseSimpleLogin){
+		alert('app is running fine');
+	var fbObj = new Firebase('https://djwadichat.firebaseio.com');
+	var userInfo = {};
+	//$rootScope.loginObj = $firebaseSimpleLogin(fbObj);
+	$scope.uObj = new FirebaseSimpleLogin(fbObj,function(error,user){
 		if(error){
-			console.log('Error not able to login');
-		}
-		else if(user){			
-			console.log('userid: '+ user.id+ "  "+ "provider: "+ user.provider);	
-			loginStatus = true;		
+			//error facing in authentication
+		}else if (user){
+			$rootScope.ui = user;
+			$scope.ui = user;
+			console.log('inner --'+user);
+			$location.url('/welcome');
 		}else{
-			console.log('user is logged out');
+			///log out 
+		}
+	});
+	
+	$scope.loginAuth= function(){
+		$scope.uObj.login('google');
+	}
+
+	$scope.loginUser = function(){
+		//console.log($rootScope.ui.id);
+		if($rootScope.ui){
+			$location.url('/welcome');	
+		}else{
+			$scope.loginAuth();
 		}
 
-});
-	$scope.authenticate =function($auth){
-  		console.log('abhijeet');
-  		$scope.auth.login('google',{debug:'true'});
-  		alert('after auth function');
-
+		
 	}
+
+
+	
 }]);
 
